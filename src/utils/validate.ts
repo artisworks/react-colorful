@@ -5,9 +5,7 @@ export const validHex = (value: string, alpha?: boolean): boolean => {
   const length = match ? match[1].length : 0;
 
   return (
-    length === 3 || // '#rgb' format
     length === 6 || // '#rrggbb' format
-    (!!alpha && length === 4) || // '#rgba' format
     (!!alpha && length === 8) // '#rrggbbaa' format
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
-import { RgbaColor } from "../../src";
+import { RgbaColor, RgbaColorPicker } from "../../src";
 import { DevTools } from "./components/DevTools";
 import { useFaviconColor } from "./hooks/useFaviconColor";
 import { useBodyBackground } from "./hooks/useBodyBackground";
@@ -10,7 +10,6 @@ import {
   Header,
   HeaderContent,
   HeaderDemo,
-  HeaderDemoPicker,
   HeaderDescription,
   HeaderTitle,
   Link,
@@ -18,6 +17,9 @@ import {
   Links,
   LinkSeparator,
 } from "./styles";
+import { AlphaColorPicker } from "../../src/components/common/AlphaColorPicker";
+import { hsvaToRgba, rgbaToHsva } from "../../src/utils/convert";
+import { equalColorObjects } from "../../src/utils/compare";
 
 // See http://www.w3.org/TR/AERT#color-contrast
 const getBrightness = ({ r, g, b }: RgbaColor) => (r * 299 + g * 587 + b * 114) / 1000;
@@ -38,8 +40,6 @@ const Demo = () => {
   const [color, setColor] = useState<RgbaColor>(getRandomColor);
   const textColor = getBrightness(color) > 128 || color.a < 0.5 ? "#000" : "#FFF";
 
-  const stargazerCount = useStargazerCount();
-
   const handleChange = (color: RgbaColor) => {
     console.log("🎨", color);
     setColor(color);
@@ -56,33 +56,26 @@ const Demo = () => {
 
       <Header style={{ color: textColor }}>
         <HeaderDemo>
-          <HeaderDemoPicker color={color} onChange={handleChange} />
+          <AlphaColorPicker
+            colorModel={{
+              defaultColor: { r: 0, g: 0, b: 0, a: 1 },
+              toHsva: rgbaToHsva,
+              fromHsva: hsvaToRgba,
+              equal: equalColorObjects,
+            }}
+            toggleOptions={[
+              { value: "hex", label: "Bold Text", onToggle: () => console.log("toggle") },
+              { value: "hex", label: "Invert Text Color", onToggle: () => console.log("toggle") },
+            ]}
+            swatchColors={["#000000", "#FFFFFF", "#FF0000", "#00FF00", "#0000FF"]}
+            color={color}
+            onChange={handleChange}
+            onSave={(color) => console.log("save" + color)}
+            onCancel={() => console.log("cancel")}
+          />
         </HeaderDemo>
         <HeaderContent>
-          <HeaderTitle>React Colorful 🎨</HeaderTitle>
-          <HeaderDescription>
-            A tiny color picker component for React and Preact apps
-          </HeaderDescription>
-
-          <Links>
-            <Link
-              href="https://github.com/omgovich/react-colorful"
-              target="_blank"
-              rel="noreferrer"
-            >
-              GitHub
-              <LinkSeparator />
-              <LinkStarIcon />
-              {stargazerCount}
-            </Link>
-            <Link
-              href="https://www.npmjs.com/package/react-colorful"
-              target="_blank"
-              rel="noreferrer"
-            >
-              NPM
-            </Link>
-          </Links>
+          <HeaderTitle> {colorString}</HeaderTitle>
         </HeaderContent>
       </Header>
 
